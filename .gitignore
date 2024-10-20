@@ -1,0 +1,6 @@
+build/**
+dist/**
+env/**
+__pycache__/**
+deb_simple.py
+debitage_gui.spec
