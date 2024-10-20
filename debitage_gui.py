@@ -78,11 +78,21 @@ def generate_pdf():
     else:  # Optimisé +
         bar_usage, min_waste = optimize_cutting_limited_permutations(pieces, bar_length, blade_width, clearance, min_waste, max_permutations=1000, debug=True)
 
+    # Nom du fichier PDF à générer
+    pdf_filename = "debitage_resultat.pdf"
+    
     # Générer le PDF avec les résultats calculés
-    generate_cutting_pdf(bar_usage=bar_usage, bar_length=bar_length, blade_width=blade_width, clearance=clearance, pieces=pieces, filename="debitage_resultat.pdf")
+    generate_cutting_pdf(bar_usage=bar_usage, bar_length=bar_length, blade_width=blade_width, clearance=clearance, pieces=pieces, filename=pdf_filename)
+    
 
     # Afficher un message de succès dans le label de résultat
     result_text.set("Le PDF a été généré avec succès.")
+    
+    # Ouvrir automatiquement le fichier PDF
+    try:
+        os.startfile(pdf_filename)  # Ouvrir le fichier PDF avec l'application par défaut (Windows)
+    except Exception as e:
+        result_display.insert(tk.END, f"\nErreur lors de l'ouverture du PDF: {e}")
 
 
 
@@ -136,9 +146,12 @@ def run_optimization(method):
         bar_usage, min_waste = optimize_cutting_limited_permutations(pieces, bar_length, blade_width, clearance, min_waste, max_permutations=1000, debug=True)
 
     # Afficher le résultat dans le champ de texte
-    result_display.delete("1.0", tk.END)
-    result_display.insert(tk.END, display_cutting_result_shell(bar_usage, bar_length, blade_width, clearance))
+    result_display.delete("1.0", tk.END)  # Effacer le texte précédent
+    result_display.insert(tk.END, display_cutting_result_shell(bar_usage, bar_length, blade_width, clearance))  # Afficher le résultat
 
+    # Mettre à jour le label de résultat pour indiquer que l'optimisation a réussi
+    result_text.set("L'optimisation a été effectuée avec succès.")
+    
 # Initialiser la fenêtre principale
 root = tk.Tk()
 root.title("Optimisation du Débitage")
@@ -191,6 +204,10 @@ add_placeholder(pieces_text, "Entrez le nombre de pièces et la longueur (ex : 2
 result_display = tk.Text(root, height=10)
 result_display.grid(row=6, column=0, columnspan=2, padx=10, pady=10, sticky='nsew')
 
+# Ajouter le label pour afficher les messages de résultat
+result_label = tk.Label(root, textvariable=result_text, fg="green", anchor="w")
+result_label.grid(row=8, column=0, columnspan=2, padx=10, pady=10, sticky='w')
+
 # Boutons pour lancer l'optimisation et générer le PDF
 run_button = tk.Button(root, text="Lancer l'optimisation", command=lambda: run_optimization(optimization_choice.get().split('.')[0]))
 run_button.grid(row=7, column=0, padx=10, pady=10, sticky='w')
@@ -203,6 +220,7 @@ root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
 root.grid_rowconfigure(5, weight=1)
 root.grid_rowconfigure(6, weight=1)
+# root.grid_rowconfigure(7, weight=1)  # Pour le label de résultat
 
 # Lancer la fenêtre
 root.mainloop()
