@@ -1,3 +1,3 @@
-tkinter
+thinker
 pyinstaller
 reportlab
